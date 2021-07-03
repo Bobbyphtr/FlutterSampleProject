@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sample_project/model/tourism_place.dart';
+import 'detail_screen.dart';
 
 void main() => runApp(MasterApp());
 
@@ -7,102 +9,87 @@ class MasterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "My First Demo",
-      theme: ThemeData(primarySwatch: Colors.yellow),
-      home: FirstScreen(),
+      theme: ThemeData(primarySwatch: Colors.green),
+      home: ListScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class FirstScreen extends StatelessWidget {
+class ListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("First Screen"),
-          leading: IconButton(
-            icon: Icon(
-              Icons.menu,
-              color: Colors.black,
-            ),
-            onPressed: null,
-          ),
-          actions: <Widget>[
-            IconButton(
-                onPressed: null,
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.black,
-                ))
-          ],
+          backgroundColor: Theme.of(context).primaryColor,
+          title: Text("Wisata Bandung"),
         ),
-        body: Column(
-          children: [
-            Heading("This is my heading"),
-            Center(
-              child: TextButton(
-                child: Text("Hello button"),
-                onPressed: () => print("Hello"),
-              ),
-            ),
-            BiggerText("Bigger Me!")
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
-        floatingActionButton: Padding(
-          padding: EdgeInsets.all(8),
-          child: FloatingActionButton(
-            onPressed: () => print("Floating Pressed"),
-            child: Icon(
-              Icons.add,
-              color: Colors.black,
-            ),
-          ),
+        body: ListView.builder(
+          itemBuilder: (context, index) {
+            final TourismPlace place = tourismPlaceList[index];
+            return InkWell(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return DetailScreen(
+                      model: place,
+                    );
+                  }));
+                },
+                child: PlaceItemCard(
+                  imageAssetUrl: place.imageAsset,
+                  placeDescription: place.location,
+                  placeName: place.name,
+                ));
+          },
+          itemCount: tourismPlaceList.length,
         ));
   }
 }
 
-// Stateless example
-class Heading extends StatelessWidget {
-  final String _text;
+class PlaceItemCard extends StatelessWidget {
+  String imageAssetUrl;
+  String placeName;
+  String placeDescription;
 
-  Heading(this._text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      this._text,
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    );
-  }
-}
-
-// Stateful Example
-class BiggerText extends StatefulWidget {
-  final String text;
-
-  BiggerText(this.text);
-
-  @override
-  _BiggerTextState createState() => _BiggerTextState();
-}
-
-class _BiggerTextState extends State<BiggerText> {
-  double _textSize = 32.0;
+  PlaceItemCard(
+      {required this.imageAssetUrl,
+      required this.placeName,
+      required this.placeDescription});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          widget.text,
-          style: TextStyle(fontSize: _textSize),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Hero(tag: "gambar", child: Image.asset(imageAssetUrl)),
+            ),
+            Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        placeName,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      Text(placeDescription)
+                    ],
+                  ),
+                ))
+          ],
         ),
-        ElevatedButton(
-            onPressed: () => setState(() => _textSize += 8),
-            child: Text("Perbesar"))
-      ],
+      ),
     );
   }
 }

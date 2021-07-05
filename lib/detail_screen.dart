@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sample_project/model/tourism_place.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -26,100 +27,145 @@ class DetailScreen extends StatelessWidget {
   }
 }
 
-class DetailPageWeb extends StatelessWidget {
+class DetailPageWeb extends StatefulWidget {
   TourismPlace model;
 
   DetailPageWeb({required this.model});
 
   @override
+  _DetailPageWebState createState() => _DetailPageWebState();
+}
+
+class _DetailPageWebState extends State<DetailPageWeb> {
+  final _scrollController = ScrollController();
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Wisata Bandung".toUpperCase(),
-            textAlign: TextAlign.start,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          Row(
+      child: Center(
+        child: Container(
+          width: 1200,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      clipBehavior: Clip.antiAlias,
-                      child: Image(
-                        image: AssetImage(kIsWeb
-                            ? model.imageAsset
-                            : "assets/" + model.imageAsset),
-                      ),
-                    ),
-                    Container(
-                      height: 150,
-                      child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: model.imageUrls.map((url) {
-                            return Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 8, 8, 0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(url),
-                              ),
-                            );
-                          }).toList()),
-                    ),
-                  ],
-                ),
+              Text(
+                "Wisata Bandung".toUpperCase(),
+                textAlign: TextAlign.start,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
               ),
               SizedBox(
-                width: 16,
+                height: 16,
               ),
-              Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        model.name.toUpperCase(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 24),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(Icons.calendar_today, color: Colors.black),
-                          Text(model.openDays),
-                          Spacer(),
-                          FavoriteButton(),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.watch_later_outlined),
-                          Text(model.openTime),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.monochrome_photos_outlined),
-                          Text(model.ticketPrice),
-                        ],
-                      ),
-                      Text(model.description)
-                    ],
-                  ))
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          clipBehavior: Clip.antiAlias,
+                          child: Image(
+                            image: AssetImage(kIsWeb
+                                ? widget.model.imageAsset
+                                : "assets/" + widget.model.imageAsset),
+                          ),
+                        ),
+                        Container(
+                          height: 150,
+                          child: Scrollbar(
+                            controller: _scrollController,
+                            isAlwaysShown: true,
+                            child: ListView(
+                                controller: _scrollController,
+                                padding: const EdgeInsets.only(bottom: 16),
+                                scrollDirection: Axis.horizontal,
+                                children: widget.model.imageUrls.map((url) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 8, 8, 0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(url),
+                                    ),
+                                  );
+                                }).toList()),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: Card(
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text(
+                                widget.model.name.toUpperCase(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 24),
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(Icons.calendar_today,
+                                      color: Colors.black),
+                                  Text(widget.model.openDays),
+                                  Spacer(),
+                                  FavoriteButton(),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.watch_later_outlined),
+                                  Text(widget.model.openTime),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.monochrome_photos_outlined),
+                                  Text(widget.model.ticketPrice),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Text(widget.model.description)
+                            ],
+                          ),
+                        ),
+                      ))
+                ],
+              )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
 
